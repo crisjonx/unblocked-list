@@ -313,7 +313,7 @@
 
   .featured-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
     gap:10px;
   }
 
@@ -350,7 +350,7 @@
 
   .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
     gap:10px;
   }
 
@@ -415,31 +415,6 @@
     height:100%;
     border:0;
     background:#000;
-  }
-
-  .home-float{
-    position:fixed;
-    top:14px;
-    left:14px;
-    z-index:2150;
-    width:38px;
-    height:38px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.32);
-    background:rgba(0,0,0,.88);
-    color:#fff;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    box-shadow:0 10px 22px rgba(0,0,0,.5);
-    transition:transform .16s ease, background .16s ease, border-color .16s ease, opacity .16s ease;
-  }
-  .home-float.open{display:flex}
-  .home-float:hover{
-    transform:translateX(-2px);
-    background:#111;
-    border-color:rgba(255,255,255,.5);
   }
 
   .back-edge{
@@ -779,11 +754,65 @@
       height:min(72vh, 620px);
     }
     .grid{
-      grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+      grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
     }
     .featured-grid{
-      grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
     }
+  }
+
+  /* Theme presets */
+  html[data-theme="monochrome"]{
+    --bg:#000000;
+    --bg2:#050505;
+    --panel:rgba(12,12,12,.78);
+    --panel2:rgba(8,8,8,.92);
+    --text:#f3f4f6;
+    --muted:#9ca3af;
+    --muted2:#6b7280;
+    --border:rgba(255,255,255,.09);
+    --border2:rgba(255,255,255,.16);
+    --accent:#ffffff;
+    --accent2:#d1d5db;
+  }
+  html[data-theme="neon"]{
+    --bg:#05020a;
+    --bg2:#0d0820;
+    --panel:rgba(15,10,24,.78);
+    --panel2:rgba(10,6,18,.92);
+    --text:#f7f2ff;
+    --muted:#c4b5fd;
+    --muted2:#9f86ff;
+    --border:rgba(196,181,253,.18);
+    --border2:rgba(245,208,254,.28);
+    --accent:#f5d0fe;
+    --accent2:#e9d5ff;
+  }
+  html[data-theme="arctic"]{
+    --bg:#041019;
+    --bg2:#081827;
+    --panel:rgba(8,18,30,.82);
+    --panel2:rgba(6,14,24,.94);
+    --text:#ecfeff;
+    --muted:#a5f3fc;
+    --muted2:#67e8f9;
+    --border:rgba(165,243,252,.18);
+    --border2:rgba(207,250,254,.30);
+    --accent:#cffafe;
+    --accent2:#a5f3fc;
+  }
+  html[data-theme="amber"]{
+    --bg:#120d05;
+    --bg2:#241607;
+    --panel:rgba(24,16,8,.82);
+    --panel2:rgba(18,12,6,.94);
+    --text:#fff7ed;
+    --muted:#fdba74;
+    --muted2:#fb923c;
+    --border:rgba(253,186,116,.20);
+    --border2:rgba(255,237,213,.32);
+    --accent:#ffedd5;
+    --accent2:#fed7aa;
   }
 </style>
 </head>
@@ -804,6 +833,7 @@
     </div>
 
     <div class="header-actions">
+      <button class="btn" id="themeBtn" type="button">Theme</button>
       <button class="btn" id="suggestBtn" type="button">Suggest games</button>
       <button class="btn primary" id="openChatBtn" type="button">✦ AI chat</button>
     </div>
@@ -837,7 +867,6 @@
 </div>
 
 <div id="gameOverlay" aria-hidden="true">
-  <button class="home-float" id="homeFloatBtn" type="button" aria-label="Back home">←</button>
   <div class="back-edge" id="backEdge" aria-hidden="true" title="Back">
     <button class="back-button" id="backBtn" type="button" aria-label="Back to list">←</button>
   </div>
@@ -1183,6 +1212,13 @@ const SPECIAL_NAMES = new Map([
   ['superhot-prototype', 'Superhot Prototype']
 ]);
 
+const THEMES = [
+  { key:'monochrome', name:'Monochrome' },
+  { key:'neon', name:'Neon' },
+  { key:'arctic', name:'Arctic' },
+  { key:'amber', name:'Amber' }
+];
+
 const input = document.getElementById('termInput');
 const grid = document.getElementById('grid');
 const featuredGrid = document.getElementById('featuredGrid');
@@ -1194,7 +1230,7 @@ const gameOverlay = document.getElementById('gameOverlay');
 const gameFrame = document.getElementById('gameFrame');
 const backEdge = document.getElementById('backEdge');
 const backBtn = document.getElementById('backBtn');
-const homeFloatBtn = document.getElementById('homeFloatBtn');
+const themeBtn = document.getElementById('themeBtn');
 
 const chatPanel = document.getElementById('chatPanel');
 const chatMessages = document.getElementById('chatMessages');
@@ -1218,6 +1254,7 @@ let active = -1;
 let chatOpen = false;
 let sendLock = false;
 let gameOpen = false;
+let themeIndex = 0;
 
 const conversation = [
   {
@@ -1252,7 +1289,7 @@ function escapeHtml(str) {
 function prettyName(name) {
   if (SPECIAL_NAMES.has(name)) return SPECIAL_NAMES.get(name);
   const rawTitle = name
-    .replace(/\/+/g, ' / ')
+    .replace(/\/+ /g, ' / ')
     .replace(/[-_]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -1397,7 +1434,6 @@ function openGame(name, push = true) {
   gameFrame.src = url;
   gameOverlay.classList.remove('closing');
   gameOverlay.classList.add('open');
-  homeFloatBtn.classList.add('open');
   gameOverlay.setAttribute('aria-hidden', 'false');
   document.body.classList.add('no-scroll');
   gameOpen = true;
@@ -1413,7 +1449,6 @@ function openGame(name, push = true) {
 function closeGame(fromPop = false) {
   gameOverlay.classList.add('closing');
   gameOverlay.classList.remove('open');
-  homeFloatBtn.classList.remove('open');
   gameOverlay.setAttribute('aria-hidden', 'true');
   backEdge.classList.remove('show');
   document.body.classList.remove('no-scroll');
@@ -1510,10 +1545,7 @@ async function sendChat() {
   const localGame = findLocalGame(text);
   if (localGame) {
     conversation.push({ role: 'user', content: text });
-    conversation.push({
-      role: 'assistant',
-      content: `Opening **${prettyName(localGame)}**.\n\nPath: \`${toPrettyPath(localGame)}\``
-    });
+    conversation.push({ role: 'assistant', content: `Opening **${prettyName(localGame)}**.\n\nPath: \`${toPrettyPath(localGame)}\`` });
     openGame(localGame);
     renderAssistantMessage(`Opening **${prettyName(localGame)}**.\n\nPath: \`${toPrettyPath(localGame)}\``);
     sendLock = false;
@@ -1648,6 +1680,19 @@ function downloadSuggestionsExport() {
   a.remove();
 }
 
+function cycleTheme() {
+  themeIndex = (themeIndex + 1) % THEMES.length;
+  applyTheme(THEMES[themeIndex].key);
+}
+
+function applyTheme(key) {
+  document.documentElement.dataset.theme = key;
+  localStorage.setItem('ui-theme', key);
+  const current = THEMES.find(t => t.key === key) || THEMES[0];
+  themeBtn.textContent = `Theme: ${current.name}`;
+  themeIndex = Math.max(0, THEMES.findIndex(t => t.key === key));
+}
+
 function isExportRoute() {
   return location.pathname.endsWith('/sg-export') || location.hash === '#sg-export';
 }
@@ -1712,7 +1757,7 @@ document.addEventListener('click', ev => {
 });
 
 backBtn.addEventListener('click', () => history.back());
-homeFloatBtn.addEventListener('click', () => history.back());
+themeBtn.addEventListener('click', cycleTheme);
 
 gameOverlay.addEventListener('mousemove', e => {
   if (!gameOpen) return;
@@ -1789,11 +1834,13 @@ renderGrid('');
 input.value = '';
 setTimeout(() => input.focus(), 100);
 
+const savedTheme = localStorage.getItem('ui-theme') || 'monochrome';
+applyTheme(savedTheme);
+
 if (isExportRoute()) {
   setTimeout(downloadSuggestionsExport, 150);
 }
 
-/* If reloading with a game hash, reopen that game. */
 if (location.hash.startsWith('#game=')) {
   const encoded = location.hash.slice(6);
   const decoded = decodeURIComponent(encoded);
