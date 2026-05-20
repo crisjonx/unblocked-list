@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Home</title>
-<link rel="icon" href="/favicon.png" />
+<link rel="icon" href="unblocked-list/image.png" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,7 +73,9 @@
 
   .wrap{
     min-height:100vh;
-    padding:22px 24px 120px;
+    width:min(100%,1920px);
+    margin:0 auto;
+    padding:18px 12px 120px;
     display:flex;
     flex-direction:column;
     gap:16px;
@@ -122,7 +124,7 @@
     font:inherit;
     font-size:13px;
     padding:12px 18px;
-    min-width:132px;
+    min-width:168px;
     border-radius:12px;
     cursor:pointer;
     transition:transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease, opacity .12s ease;
@@ -226,7 +228,7 @@
   }
   .featured-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(176px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
     gap:10px;
   }
   .feature-card{
@@ -250,7 +252,7 @@
 
   .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(122px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
     gap:10px;
   }
   a.item{
@@ -298,29 +300,36 @@
     max-width:220px;
     height:100%;
     z-index:2100;
-    display:none;
-    pointer-events:none;
+    display:block;
+    pointer-events:auto;
+    opacity:0;
+    transition:opacity .12s ease;
+    background:linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.02), transparent);
   }
-  .back-sensor.show{display:block;pointer-events:auto}
+  .back-sensor.show{opacity:1}
   .back-button{
     position:absolute;
-    top:14px;
+    top:50%;
     left:14px;
-    width:54px;
-    height:54px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.26);
-    background:#000;
+    width:58px;
+    height:158px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.22);
+    background:rgba(0,0,0,.52);
     color:#fff;
-    font-size:23px;
     cursor:pointer;
     box-shadow:0 10px 24px rgba(0,0,0,.45);
-    opacity:.96;
+    opacity:.72;
+    transform:translateY(-50%);
     transition:transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    backdrop-filter:blur(6px);
   }
   .back-sensor.show .back-button,
-  .back-sensor:hover .back-button{transform:translateY(-2px)}
-  .back-button:hover{background:#111;border-color:#fff;opacity:1}
+  .back-sensor:hover .back-button{transform:translateY(-50%) translateX(1px);opacity:.92;background:rgba(0,0,0,.62)}
+  .back-button:hover{background:rgba(17,17,17,.72);border-color:#fff;opacity:1}
 
   .chat-panel{
     position:fixed;
@@ -567,7 +576,11 @@
 
 <div id="gameOverlay" aria-hidden="true">
   <div class="back-sensor" id="backSensor" aria-hidden="true">
-    <button class="back-button" id="backBtn" type="button" aria-label="Back to list">←</button>
+    <button class="back-button" id="backBtn" type="button" aria-label="Back to list">
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
+        <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
   </div>
   <iframe id="gameFrame" title="Game"></iframe>
 </div>
@@ -576,6 +589,7 @@
   <div class="chat-head">
     <div>
       <h2>AI chat</h2>
+      <div class="small">Uses <code>/api/chat</code>. Keep <code>OPENROUTER_API_KEY</code> in your backend or GitHub Actions secret.</div>
     </div>
     <div class="chat-head-actions">
       <button class="icon-btn" id="chatClearBtn" type="button" title="Clear chat">⌫</button>
@@ -1282,12 +1296,11 @@ document.addEventListener('click', ev => {
 backBtn.addEventListener('click', () => closeGame(false));
 themeBtn.addEventListener('click', cycleTheme);
 
-window.addEventListener('mousemove', e => {
-  if (!gameOpen) return;
-  backSensor.classList.toggle('show', e.clientX <= window.innerWidth * 0.10);
-});
-window.addEventListener('mouseleave', () => {
+backSensor.addEventListener('mouseenter', () => {
   if (gameOpen) backSensor.classList.add('show');
+});
+backSensor.addEventListener('mouseleave', () => {
+  if (gameOpen) backSensor.classList.remove('show');
 });
 window.addEventListener('popstate', () => {
   if (gameOpen) closeGame(true);
