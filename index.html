@@ -543,7 +543,6 @@
     <div class="header-actions">
       <button class="btn" id="themeBtn" type="button">Theme</button>
       <button class="btn" id="suggestBtn" type="button">Suggest games</button>
-      <button class="btn primary" id="openChatBtn" type="button">✦ AI chat</button>
     </div>
   </div>
 
@@ -583,24 +582,6 @@
     </button>
   </div>
   <iframe id="gameFrame" title="Game"></iframe>
-</div>
-
-<div class="chat-panel" id="chatPanel" aria-label="AI chatbot">
-  <div class="chat-head">
-    <div>
-      <h2>AI chat</h2>
-      <div class="small">Uses <code>/api/chat</code>. Keep <code>OPENROUTER_API_KEY</code> in your backend or GitHub Actions secret.</div>
-    </div>
-    <div class="chat-head-actions">
-      <button class="icon-btn" id="chatClearBtn" type="button" title="Clear chat">⌫</button>
-      <button class="icon-btn" id="chatCloseBtn" type="button" title="Close">×</button>
-    </div>
-  </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input-wrap">
-    <textarea id="chatInput" class="chat-input" rows="1" placeholder="Ask something..."></textarea>
-    <button class="btn primary send-btn" id="chatSendBtn" type="button">Send</button>
-  </div>
 </div>
 
 <div class="modal" id="suggestModal" aria-hidden="true">
